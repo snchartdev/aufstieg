@@ -9,12 +9,12 @@ confdir="/etc/aufstieg.conf"
 checkdep(){
     if [ -f "$prtdir/deps.txt" ]; then
         for depends in $(cat "$prtdir/deps.txt"); do
-            aufstieg asdep "$depends"
+            yes | aufstieg i "$depends"
         done
     fi
 }
 installpkg(){
-    [ "$(id -u)" -ne 0 ] && echo " !! Run it from root stupid gnueblan" && exit 1
+    [ "$(id -u)" -ne 0 ] && echo " !! Run it from root, please!" && exit 1
     . "$prtdir/build.sh"
     cd "$prtdir"
     echo " ====> installing $(pwd)"
@@ -51,17 +51,6 @@ for arg in "$1"; do
                 echo " !! No $pkg port!"
             fi
             ;;
-        installdep|"asdep")
-            if [ -f "$binary" ]; then
-                echo " :: $pkg is already installed!"
-            elif [ -d "$prtdir" ]; then
-                checkdep && installpkg
-            elif [ -f "$binary" ] && [ ! -d "$prtdir" ]; then
-                echo " !! $pkg is already installed by third party app!"
-            else
-                echo " !! No $pkg port!"
-            fi
-            ;;
         remove|"del")
             if [ -d "$prtdir" ] && [ -f "$binary" ]; then
                 echo -n " :: Remove $pkg? It can't be undone [y/N] "
@@ -71,7 +60,7 @@ for arg in "$1"; do
                         echo " :: Canceled..."
                     ;;
                     y*)
-                        [ "$(id -u)" -ne 0 ] && echo " !! Run it from root stupid gnueblan" && exit 1
+                        [ "$(id -u)" -ne 0 ] && echo " !! Run it from root, please!" && exit 1
                         if [ -f "$binary" ]; then
                             echo " :: Deleting ${pkg}..."
                             rm -f "$binary"
@@ -97,6 +86,6 @@ for arg in "$1"; do
             . "$prtdir/build.sh"
             rm -rf "$prtdir/$filename"
         ;;
-        *) echo "gnueblan gnueabi environmnent. wrong command n er"
+        *) echo "Unknown argument!"
     esac
 done
